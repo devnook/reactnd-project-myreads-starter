@@ -14,10 +14,17 @@ class BooksApp extends React.Component {
     BooksAPI.getAll().then((books) => this.setState({books}));
   }
 
+  moveShelf(book, shelf) {
+    BooksAPI.update(book, shelf);
+    const books = this.state.books;
+    books[this.state.books.indexOf(book)].shelf = shelf;
+    this.setState({books});
+  }
+
   render() {
+    const moveShelf = this.moveShelf.bind(this);
     return (
       <div className="app">
-
         <Route path="/search" render={() => (
           <div className="search-books">
             <div className="search-books-bar">
@@ -52,18 +59,21 @@ class BooksApp extends React.Component {
                   books={this.state.books.filter((book) => (
                     book.shelf === 'currentlyReading'
                   ))}
+                  onMoveShelf={moveShelf}
                 />
                 <BookShelf
                   title="Want to Read"
                   books={this.state.books.filter((book) => (
                     book.shelf === 'wantToRead'
                   ))}
+                  onMoveShelf={moveShelf}
                 />
                 <BookShelf
                   title="Read"
                   books={this.state.books.filter((book) => (
                     book.shelf === 'read'
                   ))}
+                  onMoveShelf={moveShelf}
                 />
               </div>
             </div>

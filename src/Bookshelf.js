@@ -16,7 +16,9 @@ class BookShelf extends Component {
             {this.props.books.map((book, i) => {
               return (
                 <li key={i}>
-                  <Book title={book.title} authors={book.authors} coverURL={book.imageLinks && book.imageLinks.thumbnail}/>
+                  <Book
+                    book={book}
+                    onMoveShelf={this.props.onMoveShelf}/>
                 </li>
               )
             })}
@@ -29,7 +31,8 @@ class BookShelf extends Component {
 
 BookShelf.propTypes = {
   title: PropTypes.string.isRequired,
-  books: PropTypes.array.isRequired
+  books: PropTypes.array.isRequired,
+  onMoveShelf: PropTypes.func.isRequired
 };
 
 export default BookShelf
