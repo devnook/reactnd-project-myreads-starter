@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import Book from './Book.js'
 
 class BookShelf extends Component {
   render() {
@@ -7,31 +9,18 @@ class BookShelf extends Component {
       <div className="bookshelf">
         <h2 className="bookshelf-title">{this.props.title}</h2>
         <div className="bookshelf-books">
+          {!this.props.books.length && (
+            <p>No books on this bookshelf yet. <Link to="/search">Add books</Link></p>
+          )}
           <ol className="books-grid">
-            {this.props.books.map((book, i) => (
-              <li key={i}>
-                <div className="book">
-                  <div className="book-top">
-                    <div className="book-cover" style={{
-                      width: 128,
-                      height: 193,
-                      backgroundImage: `url(${book.coverURL})`
-                    }}></div>
-                    <div className="book-shelf-changer">
-                      <select>
-                        <option value="none" disabled>Move to...</option>
-                        <option value="currentlyReading">Currently Reading</option>
-                        <option value="wantToRead">Want to Read</option>
-                        <option value="read">Read</option>
-                        <option value="none">None</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="book-title">{book.title}</div>
-                  <div className="book-authors">{book.authors}</div>
-                </div>
-              </li>
-            ))}
+            {this.props.books.map((book, i) => {
+              const {title, authors, coverURL} = book;
+              return (
+                <li key={i}>
+                  <Book title={title} authors={authors} coverURL={coverURL}/>
+                </li>
+              )
+            })}
           </ol>
         </div>
       </div>
@@ -40,7 +29,8 @@ class BookShelf extends Component {
 }
 
 BookShelf.propTypes = {
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
+  books: PropTypes.array.isRequired
 };
 
 export default BookShelf
