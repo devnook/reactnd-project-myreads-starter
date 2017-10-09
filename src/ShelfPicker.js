@@ -6,7 +6,7 @@ class BookshelfPicker extends Component {
     return (
       <div className="book-shelf-changer">
         <select
-          defaultValue={this.props.shelf}
+          defaultValue={this.props.shelf || 'none'}
           onChange={(e) => {this.props.onChange(e.target.value)}}>
           <option value="none" disabled>Move to...</option>
           <option value="currentlyReading">Currently Reading</option>

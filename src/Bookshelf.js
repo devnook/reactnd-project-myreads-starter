@@ -10,7 +10,7 @@ class BookShelf extends Component {
         <h2 className="bookshelf-title">{this.props.title}</h2>
         <div className="bookshelf-books">
           {!this.props.books.length && (
-            <p>No books on this bookshelf yet. <Link to="/search">Add books</Link></p>
+            <p>No books here yet.</p>
           )}
           <ol className="books-grid">
             {this.props.books.map((book, i) => {

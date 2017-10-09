@@ -1,24 +1,59 @@
 import React from 'react'
-import { Route } from 'react-router-dom'
+import { Link, Route } from 'react-router-dom'
 // import * as BooksAPI from './BooksAPI'
 import './App.css'
 import BookShelf from './Bookshelf.js'
 import * as BooksAPI from './BooksAPI.js'
 
+
 class BooksApp extends React.Component {
   state = {
-    books: []
+    books: {},
+    searchResults: [],
+    query: ''
   }
 
   componentDidMount() {
-    BooksAPI.getAll().then((books) => this.setState({books}));
+    BooksAPI.getAll().then((bookList) => {
+      const books = bookList.reduce((result, book) => {
+        result[book.id] = book;
+        return result;
+      }, {})
+      this.setState({books})
+    });
   }
 
   moveShelf(book, shelf) {
     BooksAPI.update(book, shelf);
     const books = this.state.books;
-    books[this.state.books.indexOf(book)].shelf = shelf;
+    if (!books[book.id]) {
+      books[book.id] = book;
+    }
+    books[book.id].shelf = shelf;
     this.setState({books});
+  }
+
+  search(value) {
+    const books = this.state.books;
+    let searchResults = [];
+    this.setState({
+      query: value
+    });
+    if (value) {
+      BooksAPI.search(value).then((results) => {
+        if (!results.error) {
+          searchResults = results.map((book) => {
+            if (books[book.id]) {
+              book.shelf = books[book.id].shelf;
+            }
+            return book;
+          });
+        }
+        this.setState({searchResults});
+      });
+    } else {
+      this.setState({searchResults});
+    }
   }
 
   render() {
@@ -28,22 +63,23 @@ class BooksApp extends React.Component {
         <Route path="/search" render={() => (
           <div className="search-books">
             <div className="search-books-bar">
-              <a className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</a>
+              <Link to="/" className="close-search">Close</Link>
               <div className="search-books-input-wrapper">
-                {/*
-                  NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                  You can find these search terms here:
-                  https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-
-                  However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                  you don't find a specific author or title. Every search is limited by search terms.
-                */}
-                <input type="text" placeholder="Search by title or author"/>
-
+                <input
+                  type="text"
+                  placeholder="Search by title or author"
+                  value={this.state.query}
+                  onChange={(e) => {
+                    this.search(e.target.value);
+                  }}/>
               </div>
             </div>
             <div className="search-books-results">
-              <ol className="books-grid"></ol>
+              <BookShelf
+                title=""
+                books={this.state.searchResults}
+                onMoveShelf={moveShelf}
+              />
             </div>
           </div>
         )}/>
@@ -56,21 +92,21 @@ class BooksApp extends React.Component {
               <div>
                 <BookShelf
                   title="Currently reading"
-                  books={this.state.books.filter((book) => (
+                  books={Object.values(this.state.books).filter((book) => (
                     book.shelf === 'currentlyReading'
                   ))}
                   onMoveShelf={moveShelf}
                 />
                 <BookShelf
                   title="Want to Read"
-                  books={this.state.books.filter((book) => (
+                  books={Object.values(this.state.books).filter((book) => (
                     book.shelf === 'wantToRead'
                   ))}
                   onMoveShelf={moveShelf}
                 />
                 <BookShelf
                   title="Read"
-                  books={this.state.books.filter((book) => (
+                  books={Object.values(this.state.books).filter((book) => (
                     book.shelf === 'read'
                   ))}
                   onMoveShelf={moveShelf}
@@ -78,7 +114,7 @@ class BooksApp extends React.Component {
               </div>
             </div>
             <div className="open-search">
-              <a onClick={() => this.setState({ showSearchPage: true })}>Add a book</a>
+              <Link to="search">Add a book</Link>
             </div>
           </div>
         )}/>

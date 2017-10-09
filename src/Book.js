@@ -6,7 +6,7 @@ class Book extends Component {
   render() {
     const book = {
       title: this.props.book.title,
-      authors: this.props.book.authors,
+      authors: this.props.book.authors || [],
       shelf: this.props.book.shelf,
       coverURL: (this.props.book.imageLinks &&
         this.props.book.imageLinks.thumbnail)
